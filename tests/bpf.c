@@ -699,6 +699,15 @@ init_BPF_OBJ_PIN_attr(union bpf_attr_data *data, const size_t idx)
 # else
 		data->u64_data[0]
 # endif
+			= 0xFFFFFFFFFFFFFFFFULL;
+		return 1;
+
+	case 1:
+# ifdef HAVE_UNION_BPF_ATTR_PATHNAME
+		data->attr.pathname
+# else
+		data->u64_data[0]
+# endif
 			= 0;
 		return
 # ifdef HAVE_UNION_BPF_ATTR_PATHNAME
@@ -708,7 +717,8 @@ init_BPF_OBJ_PIN_attr(union bpf_attr_data *data, const size_t idx)
 # endif
 			;
 
-	case 1:
+	case 2:
+	case 3:
 # ifdef HAVE_UNION_BPF_ATTR_PATHNAME
 		data->attr.pathname
 # else
@@ -721,21 +731,54 @@ init_BPF_OBJ_PIN_attr(union bpf_attr_data *data, const size_t idx)
 		data->u32_data[2]
 # endif
 			= -1;
-		return
+
+		if (idx == 2)
+			return
 # ifdef HAVE_UNION_BPF_ATTR_BPF_FD
-			offsetofend(union bpf_attr, bpf_fd)
+				offsetofend(union bpf_attr, bpf_fd)
 # else
-			12
+				12
 # endif
-			;
+				;
+
+# ifdef HAVE_UNION_BPF_ATTR_FILE_FLAGS
+		data->attr.file_flags
+# else
+		data->u32_data[3]
+# endif
+			= 0x18;
+
+			return
+# ifdef HAVE_UNION_BPF_ATTR_FILE_FLAGS
+				offsetofend(union bpf_attr, file_flags)
+# else
+				16
+# endif
+				;
 	}
 
 	return -1U;
 }
 
 static const char *BPF_OBJ_PIN_strs[] = {
+	"pathname="
+# if WORDS_BIGENDIAN
+#  if defined MPERS_IS_m32 || SIZEOF_KERNEL_LONG_T > 4
+		"0xff00000000000000"
+#  elif defined __mips__ || defined __powerpc__ || \
+	defined __s390__ || defined __sparc__
+		"0xff00000000000000 or NULL"
+#  else
+		"NULL"
+#  endif
+# else
+		"0xff"
+# endif
+		", bpf_fd=0",
 	"pathname=NULL, bpf_fd=0",
 	"pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1",
+	"pathname=\"/sys/fs/bpf/foo/bar\", bpf_fd=-1"
+		", file_flags=BPF_F_RDONLY|BPF_F_WRONLY",
 };
 
 # define print_BPF_OBJ_PIN_attr NULL
@@ -979,6 +1022,7 @@ init_BPF_PROG_GET_NEXT_ID_attr(union bpf_attr_data *data, const size_t idx)
 			;
 
 	case 1:
+	case 2:
 # ifdef HAVE_UNION_BPF_ATTR_START_ID
 		data->attr.start_id
 # else
@@ -991,11 +1035,28 @@ init_BPF_PROG_GET_NEXT_ID_attr(union bpf_attr_data *data, const size_t idx)
 		data->u32_data[1]
 # endif
 			= 0xcafef00d;
-		return
+
+		if (idx == 1)
+			return
 # ifdef HAVE_UNION_BPF_ATTR_NEXT_ID
-			offsetofend(union bpf_attr, next_id)
+				offsetofend(union bpf_attr, next_id)
 # else
-			8
+				8
+# endif
+				;
+
+# ifdef HAVE_UNION_BPF_ATTR_OPEN_FLAGS
+		data->attr.open_flags
+# else
+		data->u32_data[2]
+# endif
+			= 0xffffff27;
+
+		return
+# ifdef HAVE_UNION_BPF_ATTR_OPEN_FLAGS
+			offsetofend(union bpf_attr, open_flags)
+# else
+			12
 # endif
 			;
 	}
@@ -1006,6 +1067,8 @@ init_BPF_PROG_GET_NEXT_ID_attr(union bpf_attr_data *data, const size_t idx)
 static const char *BPF_PROG_GET_NEXT_ID_strs[] = {
 	"start_id=3735928559, next_id=0",
 	"start_id=3134983661, next_id=3405705229",
+	"start_id=3134983661, next_id=3405705229"
+		", open_flags=0xffffff27 /* BPF_F_??? */",
 };
 
 # define print_BPF_PROG_GET_NEXT_ID_attr NULL
@@ -1021,6 +1084,8 @@ static const char *BPF_PROG_GET_NEXT_ID_strs[] = {
 static const char *BPF_PROG_GET_FD_BY_ID_strs[] = {
 	"prog_id=3735928559, next_id=0",
 	"prog_id=3134983661, next_id=3405705229",
+	"prog_id=3134983661, next_id=3405705229"
+		", open_flags=0xffffff27 /* BPF_F_??? */",
 };
 
 # define print_BPF_PROG_GET_FD_BY_ID_attr NULL
@@ -1031,6 +1096,8 @@ static const char *BPF_PROG_GET_FD_BY_ID_strs[] = {
 static const char *BPF_MAP_GET_FD_BY_ID_strs[] = {
 	"map_id=3735928559, next_id=0",
 	"map_id=3134983661, next_id=3405705229",
+	"map_id=3134983661, next_id=3405705229"
+		", open_flags=0xffffff27 /* BPF_F_??? */",
 };
 
 # define print_BPF_MAP_GET_FD_BY_ID_attr NULL

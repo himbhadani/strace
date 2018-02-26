@@ -512,6 +512,7 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 
 		union bpf_attr.pathname,
 		union bpf_attr.bpf_fd,
+		union bpf_attr.file_flags,
 
 		union bpf_attr.target_fd,
 		union bpf_attr.attach_bpf_fd,
@@ -531,6 +532,7 @@ AC_CHECK_HEADERS([linux/bpf.h], [
 		union bpf_attr.prog_id,
 		union bpf_attr.map_id,
 		union bpf_attr.next_id,
+		union bpf_attr.open_flags,
 
 		union bpf_attr.info.bpf_fd,
 		union bpf_attr.info.info_len,
