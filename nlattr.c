@@ -58,10 +58,14 @@ print_nlattr(const struct nlattr *const nla,
 	BUILD_BUG(NLA_TYPE_MASK == ~(NLA_F_NESTED | NLA_F_NET_BYTEORDER));
 
 	tprintf("{nla_len=%u, nla_type=", nla->nla_len);
-	if (nla->nla_type & NLA_F_NESTED)
-		tprints("NLA_F_NESTED|");
-	if (nla->nla_type & NLA_F_NET_BYTEORDER)
-		tprints("NLA_F_NET_BYTEORDER|");
+	if (nla->nla_type & NLA_F_NESTED) {
+		print_xlat(NLA_F_NESTED);
+		tprints("|");
+	}
+	if (nla->nla_type & NLA_F_NET_BYTEORDER) {
+		print_xlat(NLA_F_NET_BYTEORDER);
+		tprints("|");
+	}
 	printxval(table, nla->nla_type & NLA_TYPE_MASK, dflt);
 	tprints("}");
 }
