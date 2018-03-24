@@ -201,7 +201,9 @@ DEF_BPF_CMD_DECODER(BPF_PROG_LOAD)
 		uint64_t ATTRIBUTE_ALIGNED(8) log_buf;
 		uint32_t kern_version, prog_flags;
 	} attr = {};
-	const unsigned int len = MIN(size, sizeof(attr));
+	const size_t attr_size =
+		offsetofend(struct bpf_prog_load, prog_flags);
+	const unsigned int len = MIN(size, attr_size);
 
 	memcpy(&attr, data, len);
 
@@ -231,7 +233,7 @@ DEF_BPF_CMD_DECODER(BPF_PROG_LOAD)
 		goto bpf_prog_load_end;
 	PRINT_FIELD_FLAGS(", ", attr, prog_flags, bpf_prog_flags, "BPF_F_???");
 
-	decode_attr_extra_data(tcp, data, size, sizeof(attr));
+	decode_attr_extra_data(tcp, data, size, attr_size);
 
 bpf_prog_load_end:
 	tprints("}");
