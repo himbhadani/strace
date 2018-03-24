@@ -465,15 +465,76 @@ AC_CHECK_HEADERS([linux/input.h], [
 ])
 
 AC_CHECK_HEADERS([linux/bpf.h], [
+	AC_CHECK_TYPES(m4_normalize([
+		union bpf_attr,
+		struct bpf_insn
+	]),,, [#include <linux/bpf.h>])
+
+	AC_CHECK_DECLS(m4_normalize([
+		BPF_MAP_CREATE,
+		BPF_MAP_LOOKUP_ELEM,
+		BPF_MAP_UPDATE_ELEM,
+		BPF_MAP_DELETE_ELEM,
+		BPF_MAP_GET_NEXT_KEY,
+		BPF_PROG_LOAD,
+		BPF_OBJ_PIN,
+		BPF_OBJ_GET,
+		BPF_PROG_ATTACH,
+		BPF_PROG_DETACH,
+		BPF_PROG_TEST_RUN,
+		BPF_PROG_GET_NEXT_ID,
+		BPF_MAP_GET_NEXT_ID,
+		BPF_PROG_GET_FD_BY_ID,
+		BPF_MAP_GET_FD_BY_ID,
+		BPF_OBJ_GET_INFO_BY_FD
+	]),,, [#include <linux/bpf.h>])
+
 	AC_CHECK_MEMBERS(m4_normalize([
-		union bpf_attr.attach_flags,
-		union bpf_attr.bpf_fd,
-		union bpf_attr.flags,
-		union bpf_attr.info.info,
-		union bpf_attr.next_id,
+		union bpf_attr.map_flags,
+		union bpf_attr.inner_map_fd,
 		union bpf_attr.numa_node,
+
+		union bpf_attr.map_fd,
+		union bpf_attr.key,
+		union bpf_attr.value,
+		union bpf_attr.next_key,
+		union bpf_attr.flags,
+
+		union bpf_attr.prog_type,
+		union bpf_attr.insn_cnt,
+		union bpf_attr.insns,
+		union bpf_attr.license,
+		union bpf_attr.log_level,
+		union bpf_attr.log_size,
+		union bpf_attr.log_buf,
+		union bpf_attr.kern_version,
 		union bpf_attr.prog_flags,
-		union bpf_attr.test.duration
+
+		union bpf_attr.pathname,
+		union bpf_attr.bpf_fd,
+
+		union bpf_attr.target_fd,
+		union bpf_attr.attach_bpf_fd,
+		union bpf_attr.attach_type,
+		union bpf_attr.attach_flags,
+
+		union bpf_attr.test.prog_fd,
+		union bpf_attr.test.retval,
+		union bpf_attr.test.data_size_in,
+		union bpf_attr.test.data_size_out,
+		union bpf_attr.test.data_in,
+		union bpf_attr.test.data_out,
+		union bpf_attr.test.repeat,
+		union bpf_attr.test.duration,
+
+		union bpf_attr.start_id,
+		union bpf_attr.prog_id,
+		union bpf_attr.map_id,
+		union bpf_attr.next_id,
+
+		union bpf_attr.info.bpf_fd,
+		union bpf_attr.info.info_len,
+		union bpf_attr.info.info
 	]),,, [#include <linux/bpf.h>])
 ])
 
